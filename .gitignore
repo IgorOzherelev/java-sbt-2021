@@ -1,0 +1,5 @@
+.idea
+.grandle
+
+# Project exclude paths
+/.gradle/
