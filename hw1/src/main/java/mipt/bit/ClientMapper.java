@@ -48,15 +48,15 @@ public class ClientMapper {
         }
     }
 
-    private static Client secondApproach(Map<String, AbstractJsonElement> jsonMap) throws WrongClientTypeException {
+    public static Client secondApproach(Map<String, AbstractJsonElement> jsonMap) throws WrongClientTypeException {
         String type = ((JsonNode)jsonMap.get(typeFieldName)).getValue();
         return ClientType.valueOf(type).createClient(jsonMap);
     }
 
     public static void main(String[] args) throws RecursionDepthException, WrongClientTypeException {
 //        JsonParser parser = new JsonParser(jsonLegalEntity);
-//        JsonParser parser = new JsonParser(jsonLegalEntity);
-        JsonParser parser = new JsonParser(jsonHolding);
+        JsonParser parser = new JsonParser(jsonIndividual);
+//        JsonParser parser = new JsonParser(jsonHolding);
         Map<String, AbstractJsonElement> jsonMap = parser.parseJson();
 
         System.out.println(secondApproach(jsonMap));

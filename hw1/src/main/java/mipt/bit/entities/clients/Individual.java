@@ -5,9 +5,9 @@ import java.util.Objects;
 public class Individual implements Client {
     private final String name;
     private final String surname;
-    private final int inn;
+    private final String inn;
 
-    public Individual(String name, String surname, int inn) {
+    public Individual(String name, String surname, String inn) {
         this.name = name;
         this.surname = surname;
         this.inn = inn;
@@ -18,7 +18,7 @@ public class Individual implements Client {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Individual that = (Individual) o;
-        return name.equals(that.name) && surname.equals(that.surname) && (inn == that.inn);
+        return name.equals(that.name) && surname.equals(that.surname) && (inn.equals(that.inn));
     }
 
     @Override

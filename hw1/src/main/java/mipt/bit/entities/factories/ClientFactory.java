@@ -25,11 +25,11 @@ public class ClientFactory {
         return createIndividual(
                 ((JsonNode)jsonMap.get("name")).getValue(),
                 ((JsonNode)jsonMap.get("surname")).getValue(),
-                Integer.parseInt(((JsonNode) jsonMap.get("inn")).getValue())
+                ((JsonNode) jsonMap.get("inn")).getValue()
         );
     }
 
-    public static Individual createIndividual(String name, String surname, int inn) {
+    public static Individual createIndividual(String name, String surname, String inn) {
         checkInn(inn, ClientType.INDIVIDUAL.getValue());
         return new Individual(name, surname, inn);
     }
@@ -51,8 +51,8 @@ public class ClientFactory {
     }
 
     public static Holding createHolding(String name, int inn, List<Integer> companiesInn) {
-        checkInn(inn, ClientType.HOLDING.getValue());
-        companiesInn.forEach(inn_ -> checkInn(inn_, ClientType.HOLDING.getValue()));
+        checkInn(String.valueOf(inn), ClientType.HOLDING.getValue());
+        companiesInn.forEach(inn_ -> checkInn(String.valueOf(inn_), ClientType.HOLDING.getValue()));
         return new Holding(name, inn, companiesInn);
     }
 
@@ -68,7 +68,8 @@ public class ClientFactory {
     }
 
     public static LegalEntity createLegalEntity(String name, int inn) {
-        checkInn(inn, ClientType.LEGAL_ENTITY.getValue());
+        String innString = String.valueOf(inn);
+        checkInn(innString, ClientType.LEGAL_ENTITY.getValue());
         return new LegalEntity(name, inn);
     }
 
@@ -80,9 +81,9 @@ public class ClientFactory {
         }
     }
 
-    private static void checkInn(int inn, String typeInn) {
-        int innStringLength = String.valueOf(inn).length();
-        if (inn < 0) {
+    private static void checkInn(String inn, String typeInn) {
+        int innStringLength = inn.length();
+        if (inn.charAt(0) == '-') {
             throw new IllegalArgumentException("Illegal inn < 0 " + "inn: " + inn);
         }
 
