@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 
 import static mipt.bit.utils.Utils.checkNotNull;
 
+/**
+ * Можно было и через рефлексию, но как-то не хотелось.
+ * К тому же с рефлексией инициализации за O(n), а тут почти для всех клиентов за O(1).
+ * */
 public class ClientFactory {
     private final static String typeFieldName = "clientType";
 

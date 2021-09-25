@@ -1,6 +1,5 @@
 package mipt.bit;
 
-import mipt.bit.entities.clients.Client;
 import mipt.bit.entities.enums.ClientType;
 import mipt.bit.entities.factories.ClientFactory;
 import mipt.bit.entities.factories.exceptions.WrongClientTypeException;
