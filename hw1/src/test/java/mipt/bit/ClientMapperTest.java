@@ -35,14 +35,8 @@ public class ClientMapperTest {
             " \"companiesInn\": [1234567890, 1234567890, 1234567890] \n" +
             "}";
 
-    private final LegalEntity legalEntity =
-            new LegalEntity(
-                    "ОООМатрешка",
-                    1234567890
-            );
-
+    private final LegalEntity legalEntity = new LegalEntity("ОООМатрешка", 1234567890);
     private final Individual individual = new Individual("Иван", "Иванов", "123456789012");
-
     private final Holding holding = new Holding("Холдинг", 1234567891, Arrays.asList(1234567890, 1234567890, 1234567890));
 
     @Test
