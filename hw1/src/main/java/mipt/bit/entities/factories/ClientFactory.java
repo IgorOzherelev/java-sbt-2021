@@ -61,7 +61,7 @@ public class ClientFactory {
         checkClientType(typeNode, ClientType.LEGAL_ENTITY.getValue());
 
 
-        return new LegalEntity(
+        return createLegalEntity(
                 ((JsonNode)jsonMap.get("name")).getValue(),
                 Integer.parseInt(((JsonNode)jsonMap.get("inn")).getValue())
         );

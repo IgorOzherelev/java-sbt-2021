@@ -41,37 +41,37 @@ public class ClientMapperTest {
 
     @Test
     public void test001_firstApproach_LegalEntity_positive() throws RecursionDepthException, WrongClientTypeException {
-        LegalEntity legalEntity = (LegalEntity) getFirstApproachResult(jsonLegalEntity);
+        LegalEntity legalEntity = getFirstApproachResult(jsonLegalEntity, LegalEntity.class);
         Assertions.assertEquals(this.legalEntity, legalEntity);
     }
 
     @Test
     public void test002_firstApproach_Holding_positive() throws RecursionDepthException, WrongClientTypeException {
-        Holding holding = (Holding) getFirstApproachResult(jsonHolding);
+        Holding holding = getFirstApproachResult(jsonHolding, Holding.class);
         Assertions.assertEquals(this.holding, holding);
     }
 
     @Test
     public void test003_firstApproach_Individual_positive() throws RecursionDepthException, WrongClientTypeException {
-        Individual individual = (Individual) getFirstApproachResult(jsonIndividual);
+        Individual individual = getFirstApproachResult(jsonIndividual, Individual.class);
         Assertions.assertEquals(this.individual, individual);
     }
 
     @Test
     public void test004_secondApproach_LegalEntity_positive() throws WrongClientTypeException, RecursionDepthException {
-        LegalEntity legalEntity = (LegalEntity) getSecondApproachResult(jsonLegalEntity);
+        LegalEntity legalEntity = getSecondApproachResult(jsonLegalEntity, LegalEntity.class);
         Assertions.assertEquals(this.legalEntity, legalEntity);
     }
 
     @Test
     public void test005_secondApproach_Holding_positive() throws RecursionDepthException, WrongClientTypeException {
-        Holding holding = (Holding) getSecondApproachResult(jsonHolding);
+        Holding holding = getSecondApproachResult(jsonHolding, Holding.class);
         Assertions.assertEquals(this.holding, holding);
     }
 
     @Test
     public void test006_secondApproach_Individual_positive() throws RecursionDepthException, WrongClientTypeException {
-        Individual individual = (Individual) getSecondApproachResult(jsonIndividual);
+        Individual individual = getSecondApproachResult(jsonIndividual, Individual.class);
         Assertions.assertEquals(this.individual, individual);
     }
 
@@ -80,13 +80,13 @@ public class ClientMapperTest {
         return parser.parseJson();
     }
 
-    private Client getFirstApproachResult(String json) throws RecursionDepthException, WrongClientTypeException {
+    private <T> T getFirstApproachResult(String json, Class<T> clazz) throws RecursionDepthException, WrongClientTypeException {
         Map<String, JsonElement> jsonMap = getJsonMap(json);
-        return ClientMapper.firstApproach(jsonMap);
+        return ClientMapper.firstApproach(jsonMap, clazz);
     }
 
-    private Client getSecondApproachResult(String json) throws RecursionDepthException, WrongClientTypeException {
+    private <T> T getSecondApproachResult(String json, Class<T> clazz) throws RecursionDepthException, WrongClientTypeException {
         Map<String, JsonElement> jsonMap = getJsonMap(json);
-        return ClientMapper.secondApproach(jsonMap);
+        return ClientMapper.secondApproach(jsonMap, clazz);
     }
 }

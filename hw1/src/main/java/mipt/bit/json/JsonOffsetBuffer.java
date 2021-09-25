@@ -22,11 +22,7 @@ public class JsonOffsetBuffer {
     }
 
     public void increment() {
-        if (pc + 1 < buffer.length) {
-            pc++;
-        } else {
-            pc = buffer.length;
-        }
+        shift(1);
     }
 
     public void shift(int offset) {
