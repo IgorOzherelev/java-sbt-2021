@@ -5,7 +5,7 @@ import mipt.bit.entities.enums.ClientType;
 import mipt.bit.entities.factories.ClientFactory;
 import mipt.bit.entities.factories.exceptions.WrongClientTypeException;
 import mipt.bit.json.*;
-import mipt.bit.json.elements.AbstractJsonElement;
+import mipt.bit.json.elements.JsonElement;
 import mipt.bit.json.elements.JsonNode;
 import mipt.bit.json.exceptions.RecursionDepthException;
 
@@ -34,7 +34,7 @@ public class ClientMapper {
             " \"companiesInn\": [1234567890, 1234567890, 1234567890] \n" +
             "}";
 
-    public static Client firstApproach(Map<String, AbstractJsonElement> jsonMap) throws WrongClientTypeException {
+    public static Client firstApproach(Map<String, JsonElement> jsonMap) throws WrongClientTypeException {
         String type = ((JsonNode)jsonMap.get(typeFieldName)).getValue();
         switch (type) {
             case "INDIVIDUAL":
@@ -48,7 +48,7 @@ public class ClientMapper {
         }
     }
 
-    public static Client secondApproach(Map<String, AbstractJsonElement> jsonMap) throws WrongClientTypeException {
+    public static Client secondApproach(Map<String, JsonElement> jsonMap) throws WrongClientTypeException {
         String type = ((JsonNode)jsonMap.get(typeFieldName)).getValue();
         return ClientType.valueOf(type).createClient(jsonMap);
     }
@@ -57,7 +57,7 @@ public class ClientMapper {
 //        JsonParser parser = new JsonParser(jsonLegalEntity);
         JsonParser parser = new JsonParser(jsonIndividual);
 //        JsonParser parser = new JsonParser(jsonHolding);
-        Map<String, AbstractJsonElement> jsonMap = parser.parseJson();
+        Map<String, JsonElement> jsonMap = parser.parseJson();
 
         System.out.println(secondApproach(jsonMap));
     }

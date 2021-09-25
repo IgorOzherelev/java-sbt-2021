@@ -6,7 +6,7 @@ import mipt.bit.entities.clients.Individual;
 import mipt.bit.entities.clients.LegalEntity;
 import mipt.bit.entities.factories.exceptions.WrongClientTypeException;
 import mipt.bit.json.JsonParser;
-import mipt.bit.json.elements.AbstractJsonElement;
+import mipt.bit.json.elements.JsonElement;
 import mipt.bit.json.exceptions.RecursionDepthException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -81,18 +81,18 @@ public class ClientMapperTest {
         Assertions.assertEquals(this.individual, individual);
     }
 
-    private Map<String, AbstractJsonElement> getJsonMap(String json) throws RecursionDepthException {
+    private Map<String, JsonElement> getJsonMap(String json) throws RecursionDepthException {
         JsonParser parser = new JsonParser(json);
         return parser.parseJson();
     }
 
     private Client getFirstApproachResult(String json) throws RecursionDepthException, WrongClientTypeException {
-        Map<String, AbstractJsonElement> jsonMap = getJsonMap(json);
+        Map<String, JsonElement> jsonMap = getJsonMap(json);
         return ClientMapper.firstApproach(jsonMap);
     }
 
     private Client getSecondApproachResult(String json) throws RecursionDepthException, WrongClientTypeException {
-        Map<String, AbstractJsonElement> jsonMap = getJsonMap(json);
+        Map<String, JsonElement> jsonMap = getJsonMap(json);
         return ClientMapper.secondApproach(jsonMap);
     }
 }

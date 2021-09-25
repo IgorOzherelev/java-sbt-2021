@@ -1,10 +1,9 @@
 package mipt.bit.json.elements;
 
-public class JsonNode extends AbstractJsonElement {
+public class JsonNode implements JsonElement {
     private final String value;
 
-    public JsonNode(String key, String value) {
-        super(key);
+    public JsonNode(String value) {
         this.value = value.replaceAll("\"", "");
     }
 
@@ -18,15 +17,12 @@ public class JsonNode extends AbstractJsonElement {
         if (o == null || getClass() != o.getClass()) return false;
         JsonNode jsonNode = (JsonNode) o;
 
-        String key = jsonNode.getKey();
         String value = jsonNode.getValue();
-        return this.key.equals(key) && this.value.equals(value);
+        return this.value.equals(value);
     }
 
     @Override
     public int hashCode() {
-        int result = key.hashCode();
-        result = 31 * result + value.hashCode();
-        return result;
+        return value.hashCode();
     }
 }

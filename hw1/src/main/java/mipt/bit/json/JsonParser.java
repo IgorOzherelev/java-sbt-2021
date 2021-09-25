@@ -1,6 +1,6 @@
 package mipt.bit.json;
 
-import mipt.bit.json.elements.AbstractJsonElement;
+import mipt.bit.json.elements.JsonElement;
 import mipt.bit.json.elements.JsonArray;
 import mipt.bit.json.elements.JsonNode;
 import mipt.bit.json.elements.JsonObject;
@@ -14,7 +14,7 @@ import static mipt.bit.utils.Utils.checkNotNull;
 public class JsonParser {
     private final static int MAX_RECURSION_DEPTH = 100;
 
-    private final Map<String, AbstractJsonElement> jsonMap = new HashMap<>();
+    private final Map<String, JsonElement> jsonMap = new HashMap<>();
     private final JsonOffsetBuffer jsonBuffer;
 
     private int currentDepth = 0;
@@ -51,14 +51,14 @@ public class JsonParser {
         this.jsonBuffer = new JsonOffsetBuffer(this.json.toCharArray(), 0);
     }
 
-    public Map<String, AbstractJsonElement> parseJson() throws RecursionDepthException {
+    public Map<String, JsonElement> parseJson() throws RecursionDepthException {
         checkNotNull("json", json);
         parseJsonElement();
         return jsonMap;
     }
 
-    private AbstractJsonElement parseJsonElement() throws RecursionDepthException {
-        AbstractJsonElement element;
+    private JsonElement parseJsonElement() throws RecursionDepthException {
+        JsonElement element;
 
         jsonBuffer.increment();
         if (jsonBuffer.isEndOfBuffer()) {
@@ -71,14 +71,14 @@ public class JsonParser {
         char currentChar = jsonBuffer.getChar();
 
         if (currentChar == Token.START_OBJECT_TOKEN.value) {
-            element = parseJsonObject(key);
+            element = parseJsonObject();
         } else if (currentChar == Token.START_ARRAY_TOKEN.value) {
             if (!Token.isToken(jsonBuffer.charAt(1))) {
                 isPrimitiveArray = true;
             }
-            element = parseJsonArray(key);
+            element = parseJsonArray();
         } else {
-            element = parseJsonNode(key);
+            element = parseJsonNode();
         }
 
         if (!inRecursion) {
@@ -93,8 +93,8 @@ public class JsonParser {
         return json.substring(jsonBuffer.pc, json.indexOf(Token.COLON_TOKEN.value, jsonBuffer.pc));
     }
 
-    private JsonObject parseJsonObject(String key) throws RecursionDepthException {
-        Set<AbstractJsonElement> elements = new HashSet<>();
+    private JsonObject parseJsonObject() throws RecursionDepthException {
+        Set<JsonElement> elements = new HashSet<>();
         inRecursion = true;
         currentDepth++;
         checkRecursionDepth();
@@ -113,11 +113,11 @@ public class JsonParser {
             throw new IllegalArgumentException("Set of elements is null");
         }
 
-        return new JsonObject(key, elements);
+        return new JsonObject(elements);
     }
 
-    private JsonArray parseJsonArray(String key) throws RecursionDepthException {
-        List<AbstractJsonElement> list = new ArrayList<>();
+    private JsonArray parseJsonArray() throws RecursionDepthException {
+        List<JsonElement> list = new ArrayList<>();
 
         inRecursion = true;
         currentDepth++;
@@ -127,8 +127,7 @@ public class JsonParser {
                 break;
             }
             jsonBuffer.increment();
-            // в элементы json массива обычно не проставляют ключи, поэтому key=null
-            list.add(parseJsonNode(null));
+            list.add(parseJsonNode());
         }
         inRecursion = false;
         isPrimitiveArray = false;
@@ -138,10 +137,10 @@ public class JsonParser {
             throw new IllegalArgumentException("List of elements is null");
         }
 
-        return new JsonArray(key, list);
+        return new JsonArray(list);
     }
 
-    private JsonNode parseJsonNode(String key) throws RecursionDepthException {
+    private JsonNode parseJsonNode() throws RecursionDepthException {
         int index = json.indexOf(Token.COMMA_TOKEN.value, jsonBuffer.pc);
         if (isPrimitiveArray && index == -1) {
             index = json.indexOf(Token.END_ARRAY_TOKEN.value, jsonBuffer.pc);
@@ -157,7 +156,7 @@ public class JsonParser {
         if (!jsonBuffer.isEndOfBuffer() && !isPrimitiveArray) {
             parseJsonElement();
         }
-        return new JsonNode(key, value);
+        return new JsonNode(value);
     }
 
     private void checkRecursionDepth() throws RecursionDepthException {

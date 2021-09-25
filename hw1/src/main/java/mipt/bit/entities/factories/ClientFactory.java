@@ -5,7 +5,7 @@ import mipt.bit.entities.clients.Individual;
 import mipt.bit.entities.clients.LegalEntity;
 import mipt.bit.entities.enums.ClientType;
 import mipt.bit.entities.factories.exceptions.WrongClientTypeException;
-import mipt.bit.json.elements.AbstractJsonElement;
+import mipt.bit.json.elements.JsonElement;
 import mipt.bit.json.elements.JsonArray;
 import mipt.bit.json.elements.JsonNode;
 
@@ -18,7 +18,7 @@ import static mipt.bit.utils.Utils.checkNotNull;
 public class ClientFactory {
     private final static String typeFieldName = "clientType";
 
-    public static Individual createIndividual(Map<String, AbstractJsonElement> jsonMap) throws WrongClientTypeException {
+    public static Individual createIndividual(Map<String, JsonElement> jsonMap) throws WrongClientTypeException {
         JsonNode typeNode = (JsonNode) jsonMap.get(typeFieldName);
         checkClientType(typeNode, ClientType.INDIVIDUAL.getValue());
 
@@ -34,9 +34,9 @@ public class ClientFactory {
         return new Individual(name, surname, inn);
     }
 
-    public static Holding createHolding(Map<String, AbstractJsonElement> jsonMap) throws WrongClientTypeException {
+    public static Holding createHolding(Map<String, JsonElement> jsonMap) throws WrongClientTypeException {
         JsonNode typeNode = (JsonNode) jsonMap.get(typeFieldName);
-        List<AbstractJsonElement> list = ((JsonArray)jsonMap.get("companiesInn")).getList();
+        List<JsonElement> list = ((JsonArray)jsonMap.get("companiesInn")).getList();
         List<Integer> companiesInn = list.stream().map(elem -> {
             JsonNode nodeElem = (JsonNode) elem;
             return Integer.valueOf(nodeElem.getValue());
@@ -56,7 +56,7 @@ public class ClientFactory {
         return new Holding(name, inn, companiesInn);
     }
 
-    public static LegalEntity createLegalEntity(Map<String, AbstractJsonElement> jsonMap) throws WrongClientTypeException {
+    public static LegalEntity createLegalEntity(Map<String, JsonElement> jsonMap) throws WrongClientTypeException {
         JsonNode typeNode = (JsonNode) jsonMap.get(typeFieldName);
         checkClientType(typeNode, ClientType.LEGAL_ENTITY.getValue());
 
