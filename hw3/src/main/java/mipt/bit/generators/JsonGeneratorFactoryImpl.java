@@ -5,7 +5,8 @@ import net.openhft.compiler.CompilerUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
+
+import static mipt.bit.utils.JsonGeneratorFactoryUtils.*;
 
 public class JsonGeneratorFactoryImpl<T> implements JsonGeneratorFactory<T> {
     private final Class<?> clazz;
@@ -28,6 +29,9 @@ public class JsonGeneratorFactoryImpl<T> implements JsonGeneratorFactory<T> {
         castedInstanceName = String.valueOf(className.toLowerCase().charAt(0));
         String generatorName = className.substring(className.lastIndexOf(".") + 1) + "JsonGenerator";
 
+        // jsonGeneratorBuilder передается во все методы ниже,
+        // тк надеюсь, что хватит времени, чтобы сделать рекурсивный обход для поддержки вложенных объектов
+        // В текущей реализации их, действительно, можно вынести как поле класса factory
         startJsonGeneratorClass(jsonGeneratorBuilder, className, generatorName);
 
         addFieldsSupportToJsonGenerator(jsonGeneratorBuilder, declaredFields);
@@ -40,31 +44,51 @@ public class JsonGeneratorFactoryImpl<T> implements JsonGeneratorFactory<T> {
         return (JsonGenerator<T>) generatorClazz.getDeclaredConstructor().newInstance();
     }
 
-    // todo Strings flexible support, inner objects
-    private void addFieldsSupportToJsonGenerator(StringBuilder jsonGeneratorBuilder, Field[] declaredFields)
-            throws NoSuchMethodException {
+    // todo Strings flexible support in arrays/collections; support inner objects
+    private void addFieldsSupportToJsonGenerator(StringBuilder jsonGeneratorBuilder, Field[] declaredFields) {
         Class<?> fieldType;
         String declaredFieldName;
+        int totalGettersNumber = countGetters(clazz);
+
         for (int i = 0; i < declaredFields.length; i++) {
             declaredFields[i].setAccessible(true);
-            if (i == declaredFields.length - 1)
-                isLastField = true;
             fieldType = declaredFields[i].getType();
-            if (JsonGeneratorFactoryUtils.checkIfHasGetter(clazz, declaredFields[i])) {
+            if (checkIfHasGetter(clazz, declaredFields[i])) {
+                if (i == totalGettersNumber - 1) {
+                    isLastField = true;
+                }
                 declaredFieldName = declaredFields[i].getName();
-                if (JsonGeneratorFactoryUtils.isPrimitiveOrStringWrapper(fieldType)) {
-                    addPrimitiveOrStringSupportToJsonGenerator(jsonGeneratorBuilder, declaredFieldName);
-                } else if (fieldType.isArray()) { // array field only for primitives
-                    addArraySupportToJsonGenerator(jsonGeneratorBuilder, declaredFieldName);
-                } else if (Collection.class.isAssignableFrom(fieldType)) { // collection field
-                    addCollectionSupportToJsonGenerator(jsonGeneratorBuilder, declaredFieldName);
+                if (isPrimitiveOrWrapper(fieldType)) {
+                    addPrimitiveOrWrapperFieldSupport(jsonGeneratorBuilder, declaredFieldName);
+                } else if (isString(fieldType)) {
+                    addStringFieldSupport(jsonGeneratorBuilder, declaredFieldName);
+                } else if (isArray(fieldType)) { // array field only for primitives, wrappers
+                    addArrayFieldSupport(jsonGeneratorBuilder, declaredFieldName);
+                } else if (isCollection(fieldType)) { // collection field only for primitives, wrappers
+                    addCollectionFieldSupport(jsonGeneratorBuilder, declaredFieldName);
                 }
             }
         }
     }
 
-    private void addCollectionSupportToJsonGenerator(StringBuilder jsonGeneratorBuilder, String declaredFieldName) {
-        String getterFieldFunctionName = JsonGeneratorFactoryUtils.getGetterName(declaredFieldName);
+    private void addStringFieldSupport(StringBuilder jsonGeneratorBuilder, String declaredFieldName) {
+        String getterFieldFunctionName = getGetterName(declaredFieldName);
+
+        addKeyFieldNameToJson(jsonGeneratorBuilder, declaredFieldName);
+
+        jsonGeneratorBuilder
+                .append(".append(").append("\"").append("\\")
+                .append("\"").append("\"").append("+")
+                .append(castedInstanceName).append(".")
+                .append(getterFieldFunctionName).append("()")
+                .append("+").append("\"").append("\\")
+                .append("\"").append("\"").append(")"); // closed jsonBuilder append
+
+        endJsonStringField(jsonGeneratorBuilder);
+    }
+
+    private void addCollectionFieldSupport(StringBuilder jsonGeneratorBuilder, String declaredFieldName) {
+        String getterFieldFunctionName = getGetterName(declaredFieldName);
 
         addKeyFieldNameToJson(jsonGeneratorBuilder, declaredFieldName);
 
@@ -76,8 +100,8 @@ public class JsonGeneratorFactoryImpl<T> implements JsonGeneratorFactory<T> {
         endJsonStringField(jsonGeneratorBuilder);
     }
 
-    private void addArraySupportToJsonGenerator(StringBuilder jsonGeneratorBuilder, String declaredFieldName) {
-        String getterFieldFunctionName = JsonGeneratorFactoryUtils.getGetterName(declaredFieldName);
+    private void addArrayFieldSupport(StringBuilder jsonGeneratorBuilder, String declaredFieldName) {
+        String getterFieldFunctionName = getGetterName(declaredFieldName);
 
         addKeyFieldNameToJson(jsonGeneratorBuilder, declaredFieldName);
 
@@ -91,19 +115,17 @@ public class JsonGeneratorFactoryImpl<T> implements JsonGeneratorFactory<T> {
         endJsonStringField(jsonGeneratorBuilder);
     }
 
-    private void addPrimitiveOrStringSupportToJsonGenerator(StringBuilder jsonGeneratorBuilder,
-                                                            String declaredPrimitiveFieldName) {
-        String getterFieldFunctionName = JsonGeneratorFactoryUtils.getGetterName(declaredPrimitiveFieldName);
+    private void addPrimitiveOrWrapperFieldSupport(StringBuilder jsonGeneratorBuilder,
+                                                   String declaredPrimitiveFieldName) {
+        String getterFieldFunctionName = getGetterName(declaredPrimitiveFieldName);
 
         addKeyFieldNameToJson(jsonGeneratorBuilder, declaredPrimitiveFieldName);
 
         jsonGeneratorBuilder
-                .append(".append(").append("\"").append("\\")
-                .append("\"").append("\"").append("+")
+                .append(".append(")
                 .append(castedInstanceName).append(".")
                 .append(getterFieldFunctionName).append("()")
-                .append("+").append("\"").append("\\")
-                .append("\"").append("\"").append(")"); // closed jsonBuilder append
+                .append(")"); // closed jsonBuilder append
 
         endJsonStringField(jsonGeneratorBuilder);
     }

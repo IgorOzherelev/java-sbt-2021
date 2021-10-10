@@ -3,6 +3,7 @@ package mipt.bit;
 import mipt.bit.generators.JsonGenerator;
 import mipt.bit.generators.JsonGeneratorFactory;
 import mipt.bit.generators.JsonGeneratorFactoryImpl;
+import mipt.bit.models.Letter;
 import mipt.bit.models.Person;
 import mipt.bit.models.Student;
 import mipt.bit.models.StudentWithCollection;
@@ -19,7 +20,7 @@ public class JsonGeneratorFactoryTest {
         Person person = new Person(1L, "Ivan", "Ivanov");
 
         Assertions.assertEquals("{\n" +
-                "\t\"id\":\"1\",\n" +
+                "\t\"id\":1,\n" +
                 "\t\"name\":\"Ivan\",\n" +
                 "\t\"lastName\":\"Ivanov\"\n" +
                 "}", buildJsonString(Person.class, person));
@@ -27,13 +28,16 @@ public class JsonGeneratorFactoryTest {
 
     @Test
     public void test002_whenArrayOfWrappersOrPrimitives() throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Student student = new Student(1L, "Ivan", "Ivanov", new int[4]);
+        int[] arr = new int[2];
+        arr[0] = 1;
+        arr[1] = 1;
+        Student student = new Student(1L, "Ivan", "Ivanov", arr);
 
         Assertions.assertEquals("{\n" +
-                "\t\"id\":\"1\",\n" +
+                "\t\"id\":1,\n" +
                 "\t\"name\":\"Ivan\",\n" +
                 "\t\"lastName\":\"Ivanov\",\n" +
-                "\t\"marks\":[0, 0, 0, 0]\n" +
+                "\t\"marks\":[1, 1]\n" +
                 "}", buildJsonString(Student.class, student));
     }
 
@@ -47,7 +51,7 @@ public class JsonGeneratorFactoryTest {
                 new StudentWithCollection(1L, "Ivan", "Ivanov", collection);
 
         Assertions.assertEquals("{\n" +
-                "\t\"id\":\"1\",\n" +
+                "\t\"id\":1,\n" +
                 "\t\"name\":\"Ivan\",\n" +
                 "\t\"lastName\":\"Ivanov\",\n" +
                 "\t\"marks\":[1, 2]\n" +
@@ -55,17 +59,15 @@ public class JsonGeneratorFactoryTest {
     }
 
     @Test
-    public void test004_() {
+    public void test004_whenHasNotAllGettersForFields() throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        Letter letter = new Letter("addresTo", "addressFrom");
 
+        Assertions.assertEquals("{\n" +
+                "\t\"addressTo\":\"addresTo\"\n" +
+                "}", buildJsonString(Letter.class, letter));
     }
 
-    @Test
-    public void test005_() {
-
-    }
-
-    private <T> String buildJsonString(Class<T> clazz, T instance)
-            throws ClassNotFoundException, InvocationTargetException,
+    private <T> String buildJsonString(Class<T> clazz, T instance) throws ClassNotFoundException, InvocationTargetException,
             NoSuchMethodException, InstantiationException, IllegalAccessException {
         JsonGeneratorFactory<T> factory = new JsonGeneratorFactoryImpl<>(clazz);
         JsonGenerator<T> generator = factory.createJsonGenerator();
