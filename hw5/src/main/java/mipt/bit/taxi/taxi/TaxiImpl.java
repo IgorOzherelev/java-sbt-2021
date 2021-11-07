@@ -29,7 +29,7 @@ public class TaxiImpl implements Taxi {
         while (!Thread.currentThread().isInterrupted()) {
             synchronized (lock) {
                 try {
-                    if (currentOrder == null) {
+                    while (currentOrder == null) {
                         lock.wait();
                     }
                 } catch (InterruptedException e) {

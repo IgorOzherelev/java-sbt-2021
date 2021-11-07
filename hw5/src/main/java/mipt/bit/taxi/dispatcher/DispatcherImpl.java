@@ -24,7 +24,7 @@ public class DispatcherImpl implements Dispatcher {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             synchronized (availableTaxis) {
-                if (availableTaxis.isEmpty() || orders.isEmpty()) {
+                while (availableTaxis.isEmpty() || orders.isEmpty()) {
                     try {
                         availableTaxis.wait();
                     } catch (InterruptedException e) {
