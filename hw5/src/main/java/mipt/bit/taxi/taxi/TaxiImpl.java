@@ -10,12 +10,14 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TaxiImpl implements Taxi {
     private final String uuid;
     private final Object lock = new Object();
+    private final Object processOrderLock = new Object();
+    private boolean isInterrupted = false;
+
     private final List<Order> executedOrders = new ArrayList<>();
 
     private Order currentOrder = null;
     private final Dispatcher dispatcher;
 
-    // пока что можно StringBuilder, тк используется гарантировано в 1oм потоке
     private final StringBuilder logBuilder = new StringBuilder();
 
     public TaxiImpl(Dispatcher dispatcher, String uuid) {
@@ -26,7 +28,7 @@ public class TaxiImpl implements Taxi {
     @Override
     public void run() {
         dispatcher.notifyAvailable(this); // добавляемся к диспетчеру, при первом запуске потока
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!isInterrupted) {
             synchronized (lock) {
                 try {
                     while (currentOrder == null) {
@@ -34,7 +36,7 @@ public class TaxiImpl implements Taxi {
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Thread.currentThread().interrupt();
+                    isInterrupted = true;
                 }
             }
 
@@ -64,17 +66,20 @@ public class TaxiImpl implements Taxi {
             Thread.currentThread().interrupt();
         }
 
-        executedOrders.add(currentOrder);
+        synchronized (executedOrders) {
+            synchronized (processOrderLock) {
+                executedOrders.add(currentOrder);
+                logBuilder
+                        .append("Processed order: order uuid: ").append(currentOrder.getUuid())
+                        .append(", taxi uuid: ").append(uuid)
+                        .append(", threadId: ").append(Thread.currentThread().getId())
+                        .append(", executedOrders: ").append(executedOrders.size());
 
-        logBuilder
-                .append("Processed order: order uuid: ").append(currentOrder.getUuid())
-                .append(", taxi uuid: ").append(uuid)
-                .append(", threadId: ").append(Thread.currentThread().getId())
-                .append(", executedOrders: ").append(executedOrders.size());
+                System.out.println(logBuilder);
+                logBuilder.setLength(0);
 
-        System.out.println(logBuilder);
-        logBuilder.setLength(0);
-
-        currentOrder = null;
+                currentOrder = null;
+            }
+        }
     }
 }

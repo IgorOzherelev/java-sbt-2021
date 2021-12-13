@@ -11,6 +11,7 @@ import java.util.List;
 public class DispatcherImpl implements Dispatcher {
     private final Deque<Taxi> availableTaxis = new ArrayDeque<>();
     private final Deque<Order> orders = new ArrayDeque<>();
+    private boolean isInterrupted = false;
 
     @Override
     public void notifyAvailable(Taxi taxi) {
@@ -22,14 +23,14 @@ public class DispatcherImpl implements Dispatcher {
 
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!isInterrupted) {
             synchronized (availableTaxis) {
                 while (availableTaxis.isEmpty() || orders.isEmpty()) {
                     try {
                         availableTaxis.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                        Thread.currentThread().interrupt();
+                        isInterrupted = true;
                     }
                 }
             }
@@ -39,21 +40,28 @@ public class DispatcherImpl implements Dispatcher {
     }
 
     private void processOrder() {
-        // можно не делать синхронизированным, тк гарантированно используется в одном потоке
-        if (!orders.isEmpty() && !availableTaxis.isEmpty()) {
-            Taxi tmpTaxi;
-            tmpTaxi = availableTaxis.pop();
-            tmpTaxi.placeOrder(orders.pop());
+        synchronized (orders) {
+            synchronized (availableTaxis) {
+                if (!orders.isEmpty() && !availableTaxis.isEmpty()) {
+                    Taxi tmpTaxi;
+                    tmpTaxi = availableTaxis.pop();
+                    tmpTaxi.placeOrder(orders.pop());
+                }
+            }
         }
     }
 
     @Override
     public void addOrders(List<Order> orders) {
-        this.orders.addAll(new ArrayList<>(orders));
+        synchronized (this.orders) {
+            this.orders.addAll(new ArrayList<>(orders));
+        }
     }
 
     @Override
     public void addOrder(Order order) {
-        this.orders.add(order);
+        synchronized (this.orders) {
+            this.orders.add(order);
+        }
     }
 }
