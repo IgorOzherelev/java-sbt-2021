@@ -15,7 +15,7 @@ import static mipt.bit.utlis.CommonUtils.checkInputDataArrayLengths;
 public class URLClassFilesWrapper {
     private final Map<String, byte[]> classBytesMap = new HashMap<>();
 
-    public URLClassFilesWrapper(URL[] urls, int[] classesNameLengths) throws IOException {
+    public URLClassFilesWrapper(URL[] urls, int[] classesNameLengths) throws ClassNotFoundException {
         initClassBytesMap(urls, classesNameLengths);
     }
 
@@ -23,11 +23,15 @@ public class URLClassFilesWrapper {
         return classBytesMap.get(name);
     }
 
-    private void initClassBytesMap(URL[] urls, int[] classesNameLengths) throws IOException {
+    private void initClassBytesMap(URL[] urls, int[] classesNameLengths) throws ClassNotFoundException {
         checkInputDataArrayLengths(urls.length, classesNameLengths.length);
 
         for (int i = 0; i < urls.length; i++) {
-            storeClassBytesFromURL(urls[i], classesNameLengths[i]);
+            try {
+                storeClassBytesFromURL(urls[i], classesNameLengths[i]);
+            } catch (IOException e) {
+                throw new ClassNotFoundException(e.getMessage());
+            }
         }
     }
 
