@@ -1,4 +1,4 @@
-package mipt.bit.entities.factories.exceptions;
+package mipt.bit.utils.exceptions;
 
 public class WrongClientTypeException extends Exception {
     public WrongClientTypeException(String message) {

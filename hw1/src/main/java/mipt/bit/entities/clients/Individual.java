@@ -1,6 +1,10 @@
 package mipt.bit.entities.clients;
 
+import mipt.bit.entities.enums.ClientType;
+
 import java.util.Objects;
+
+import static mipt.bit.utils.ClientUtils.checkInn;
 
 public class Individual implements Client {
     private final String name;
@@ -11,6 +15,11 @@ public class Individual implements Client {
         this.name = name;
         this.surname = surname;
         this.inn = inn;
+    }
+
+    public static Individual createIndividual(String name, String surname, String inn) {
+        checkInn(inn, ClientType.INDIVIDUAL.getValue());
+        return new Individual(name, surname, inn);
     }
 
     @Override

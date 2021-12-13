@@ -1,6 +1,10 @@
 package mipt.bit.entities.clients;
 
+import mipt.bit.entities.enums.ClientType;
+
 import java.util.Objects;
+
+import static mipt.bit.utils.ClientUtils.checkInn;
 
 public class LegalEntity implements Client {
     private final String name;
@@ -9,6 +13,12 @@ public class LegalEntity implements Client {
     public LegalEntity(String name, int inn) {
         this.name = name;
         this.inn = inn;
+    }
+
+    public static LegalEntity createLegalEntity(String name, int inn) {
+        String innString = String.valueOf(inn);
+        checkInn(innString, ClientType.LEGAL_ENTITY.getValue());
+        return new LegalEntity(name, inn);
     }
 
     @Override

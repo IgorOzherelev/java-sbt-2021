@@ -3,7 +3,7 @@ package mipt.bit;
 import mipt.bit.entities.clients.Holding;
 import mipt.bit.entities.clients.Individual;
 import mipt.bit.entities.clients.LegalEntity;
-import mipt.bit.entities.factories.exceptions.WrongClientTypeException;
+import mipt.bit.utils.exceptions.WrongClientTypeException;
 import mipt.bit.json.JsonParser;
 import mipt.bit.json.elements.JsonElement;
 import mipt.bit.json.exceptions.RecursionDepthException;
@@ -52,43 +52,43 @@ public class ClientMapperTest {
     private final Holding holding = new Holding("Холдинг", 1234567891, Arrays.asList(1234567890, 1234567890, 1234567890));
 
     @Test
-    public void test001_ClientMapperTest_firstApproach_LegalEntity_positive() throws RecursionDepthException, WrongClientTypeException {
+    public void firstApproachLegalEntityPositive() throws RecursionDepthException, WrongClientTypeException {
         LegalEntity legalEntity = getFirstApproachResult(jsonLegalEntity, LegalEntity.class);
         Assertions.assertEquals(this.legalEntity, legalEntity);
     }
 
     @Test
-    public void test002_ClientMapperTest_firstApproach_Holding_positive() throws RecursionDepthException, WrongClientTypeException {
+    public void firstApproachHoldingPositive() throws RecursionDepthException, WrongClientTypeException {
         Holding holding = getFirstApproachResult(jsonHolding, Holding.class);
         Assertions.assertEquals(this.holding, holding);
     }
 
     @Test
-    public void test003_ClientMapperTest_firstApproach_Individual_positive() throws RecursionDepthException, WrongClientTypeException {
+    public void firstApproachIndividualPositive() throws RecursionDepthException, WrongClientTypeException {
         Individual individual = getFirstApproachResult(jsonIndividual, Individual.class);
         Assertions.assertEquals(this.individual, individual);
     }
 
     @Test
-    public void test004_ClientMapperTest_secondApproach_LegalEntity_positive() throws WrongClientTypeException, RecursionDepthException {
+    public void secondApproachLegalEntityPositive() throws WrongClientTypeException, RecursionDepthException {
         LegalEntity legalEntity = getSecondApproachResult(jsonLegalEntity, LegalEntity.class);
         Assertions.assertEquals(this.legalEntity, legalEntity);
     }
 
     @Test
-    public void test005_ClientMapperTest_secondApproach_Holding_positive() throws RecursionDepthException, WrongClientTypeException {
+    public void secondApproachHoldingPositive() throws RecursionDepthException, WrongClientTypeException {
         Holding holding = getSecondApproachResult(jsonHolding, Holding.class);
         Assertions.assertEquals(this.holding, holding);
     }
 
     @Test
-    public void test006_ClientMapperTest_secondApproach_Individual_positive() throws RecursionDepthException, WrongClientTypeException {
+    public void secondApproachIndividualPositive() throws RecursionDepthException, WrongClientTypeException {
         Individual individual = getSecondApproachResult(jsonIndividual, Individual.class);
         Assertions.assertEquals(this.individual, individual);
     }
 
     @Test
-    public void test007_ClientMapperTest_wrongInn() throws RecursionDepthException, WrongClientTypeException {
+    public void secondApproachWrongInn() throws RecursionDepthException, WrongClientTypeException {
         try {
             Individual individual = getSecondApproachResult(jsonIndividualWrongInn, Individual.class);
         } catch (IllegalArgumentException ex) {
@@ -97,7 +97,7 @@ public class ClientMapperTest {
     }
 
     @Test
-    public void test008_ClientMapperTest_wrongFormat() throws RecursionDepthException, WrongClientTypeException {
+    public void secondApproachWrongFormat() throws RecursionDepthException, WrongClientTypeException {
         try {
             Individual individual = getSecondApproachResult(jsonIndividualWrongFormat, Individual.class);
         } catch (NullPointerException ex) {
