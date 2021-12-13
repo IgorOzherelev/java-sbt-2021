@@ -10,7 +10,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class TaxiImpl implements Taxi {
     private final String uuid;
     private final Object lock = new Object();
-    private final Object processOrderLock = new Object();
     private boolean isInterrupted = false;
 
     private final List<Order> executedOrders = new ArrayList<>();
@@ -38,9 +37,9 @@ public class TaxiImpl implements Taxi {
                     e.printStackTrace();
                     isInterrupted = true;
                 }
+                processOrder();
             }
 
-            processOrder();
             dispatcher.notifyAvailable(this);
         }
     }
@@ -67,19 +66,17 @@ public class TaxiImpl implements Taxi {
         }
 
         synchronized (executedOrders) {
-            synchronized (processOrderLock) {
-                executedOrders.add(currentOrder);
-                logBuilder
-                        .append("Processed order: order uuid: ").append(currentOrder.getUuid())
-                        .append(", taxi uuid: ").append(uuid)
-                        .append(", threadId: ").append(Thread.currentThread().getId())
-                        .append(", executedOrders: ").append(executedOrders.size());
+            executedOrders.add(currentOrder);
+            logBuilder
+                    .append("Processed order: order uuid: ").append(currentOrder.getUuid())
+                    .append(", taxi uuid: ").append(uuid)
+                    .append(", threadId: ").append(Thread.currentThread().getId())
+                    .append(", executedOrders: ").append(executedOrders.size());
 
-                System.out.println(logBuilder);
-                logBuilder.setLength(0);
+            System.out.println(logBuilder);
+            logBuilder.setLength(0);
 
-                currentOrder = null;
-            }
+            currentOrder = null;
         }
     }
 }
