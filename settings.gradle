@@ -1,3 +1,4 @@
 rootProject.name = 'java-sbt-2021'
 include 'hw2'
+include 'hw1'
 
