@@ -17,7 +17,7 @@ public class Car {
         this.ownerId = ownerId;
     }
 
-    Car(long carId) {
+    public Car(long carId) {
         this.carId = carId;
         this.brand = null;
         this.modelName = null;

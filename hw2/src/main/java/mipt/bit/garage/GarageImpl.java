@@ -2,7 +2,7 @@ package mipt.bit.garage;
 
 import java.util.*;
 
-import static mipt.bit.utils.Utils.checkNotNull;
+import static mipt.bit.utils.GarageUtils.*;
 
 public class GarageImpl implements Garage {
     private final Map<String, Set<Car>> brandToCars = new HashMap<>();
@@ -12,7 +12,7 @@ public class GarageImpl implements Garage {
     private final TreeSet<Car> carsOrderedByPower = new TreeSet<>(Comparator.comparing(Car::getPower).thenComparing(Car::getCarId));
 
     private final Comparator<Car> carMaxVelocityComparator = Comparator.comparing(Car::getMaxVelocity).thenComparing(Car::getCarId);
-    private final TreeSet<Car> carsOrderedByMaxVelocity = new TreeSet<>(carMaxVelocityComparator);
+    private final SortedSet<Car> carsOrderedByMaxVelocity = new TreeSet<>(carMaxVelocityComparator);
 
     @Override
     public Set<Owner> allCarsUniqueOwners() {
@@ -27,7 +27,8 @@ public class GarageImpl implements Garage {
         TreeSet<Car> cars = new TreeSet<>(carMaxVelocityComparator);
         Car tmp;
         for (int i = 0; i < 3; i++) {
-            tmp = carsOrderedByMaxVelocity.pollLast();
+            tmp = carsOrderedByMaxVelocity.last();
+            carsOrderedByMaxVelocity.remove(tmp);
             cars.add(tmp);
         }
         carsOrderedByMaxVelocity.addAll(cars);
@@ -92,8 +93,9 @@ public class GarageImpl implements Garage {
     @Override
     public int meanCarNumberForEachOwner() {
         int totalOwnersNumber = ownerToCars.keySet().size();
-        if (totalOwnersNumber != 0)
+        if (totalOwnersNumber != 0) {
             return carIdToCar.size() / totalOwnersNumber;
+        }
         return 0;
     }
 
@@ -151,49 +153,5 @@ public class GarageImpl implements Garage {
 
     public Map<Long, Car> getCarIdToCar() {
         return carIdToCar;
-    }
-
-    private <K, V> void addToMapSet(Map<K, Set<V>> map, K key, V value) {
-        Set<V> set = map.get(key);
-        if (map.get(key) == null) {
-            set = new HashSet<>();
-            set.add(value);
-            map.put(key, set);
-        } else {
-            set.add(value);
-        }
-    }
-
-    private <K> void removeCarFromMapSet(Map<K, Set<Car>> map, K key, Long carId) {
-        Set<Car> cars = map.get(key);
-        cars.remove(new Car(carId));
-
-        if (map.get(key) == null || map.get(key).isEmpty()) {
-            map.remove(key);
-        }
-    }
-
-    private void checkCar(Car car) {
-        checkNotNull("car", car);
-        String carBrand = car.getBrand();
-        String carModelName = car.getModelName();
-
-        if (carBrand == null || carBrand.isEmpty()) {
-            throw new IllegalArgumentException("Provided car has wrong parameters "
-                    + "carBrand: " + carBrand + " carModelName: " + carModelName);
-        }
-    }
-
-    private void checkCarOwner(Car car, Owner owner) {
-        checkNotNull("car", car);
-        checkNotNull("owner", owner);
-
-        long carOwnerId = car.getOwnerId();
-        long ownerId = owner.getOwnerId();
-        if (carOwnerId != ownerId) {
-            throw new IllegalArgumentException("Provided car belongs to another owner "
-                    + "car.getOwnerId(): " + carOwnerId
-                    + " ownerId: " + ownerId);
-        }
     }
 }
