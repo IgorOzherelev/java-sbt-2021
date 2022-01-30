@@ -32,7 +32,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test001_addCar_whenNullOwner() {
+    public void initWhenNullOwner() {
         Car car = new Car(1, "1", "2", 1, 1, 1);
         try {
             garage.addCar(car, null);
@@ -43,7 +43,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test002_addCar_whenNullCar() {
+    public void addCarWhenNullCar() {
         try {
             garage.addCar(null, null);
             fail();
@@ -53,7 +53,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test003_addCar_whenWrongOwner() {
+    public void addCarWhenWrongOwner() {
         Car car = new Car(1, "1", "2", 1, 1, 1);
         try {
             garage.addCar(car, owner2);
@@ -65,7 +65,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test004_removeCar_whenEmptyGarage() {
+    public void removeCarWhenEmptyGarage() {
         Car car = new Car(1, "1", "2", 1, 1, 1);
         try {
             garage.removeCar(car.getCarId());
@@ -74,7 +74,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test005_removeCar_positive() {
+    public void removeCarPositive() {
         Car car = new Car(1, "1", "2", 1, 1, 1);
         addCarToGarage(car, owner1);
 
@@ -83,7 +83,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test006_removeCar_whenTryingToRemoveUnexisted() {
+    public void removeCarWhenTryingToRemoveUnexisted() {
         Car car1 = new Car(1, "1", "2", 1, 1, 1);
         Car car2 = new Car(2, "1", "2", 1, 1, 1);
         try {
@@ -94,19 +94,19 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test007_meanCarNumberForEachOwner_positive() {
+    public void meanCarNumberForEachOwnerPositive() {
         initGarage();
         Assertions.assertEquals(3, garage.meanCarNumberForEachOwner());
     }
 
     @Test
-    public void test008_meanOwnersAgeOfCarBrand_positive() {
+    public void meanOwnersAgeOfCarBrandPositive() {
         initGarage();
         Assertions.assertEquals(20, garage.meanOwnersAgeOfCarBrand("1"));
     }
 
     @Test
-    public void test009_allCarsOfOwner_positive() {
+    public void allCarsOfOwnerPositive() {
         initGarage();
 
         Set<Car> ownerCars = garage.allCarsOfOwner(owner1);
@@ -118,7 +118,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test010_allCarsOfOwner_AfterRemove() {
+    public void allCarsOfOwnerAfterRemove() {
         initGarage();
 
         Set<Car> ownerCars = garage.allCarsOfOwner(owner1);
@@ -134,7 +134,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test011_allCarsOfBrand_positive() {
+    public void allCarsOfBrandPositive() {
         initGarage();
 
         Set<Car> cars = garage.allCarsOfBrand("1");
@@ -148,7 +148,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test012_allCarsOfBrand_AfterRemove() {
+    public void allCarsOfBrandAfterRemove() {
         initGarage();
 
         garage.removeCar(car1.getCarId());
@@ -164,7 +164,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test013_allCarsUniqueOwners_positive() {
+    public void allCarsUniqueOwnersPositive() {
         initGarage();
 
         Set<Owner> owners = garage.allCarsUniqueOwners();
@@ -174,7 +174,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test013_allCarsUniqueOwners_AfterRemovingAllOwnerCars() {
+    public void allCarsUniqueOwnersAfterRemovingAllOwnerCars() {
         initGarage();
 
         Set<Owner> owners = garage.allCarsUniqueOwners();
@@ -186,7 +186,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test014_topThreeCarsByMaxVelocity_positive() {
+    public void topThreeCarsByMaxVelocityPositive() {
         initGarage();
 
         TreeSet<Car> cars = garage.topThreeCarsByMaxVelocity();
@@ -198,7 +198,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test015_topThreeCarsByMaxVelocity_AfterDeletionPreviousTopThree() {
+    public void topThreeCarsByMaxVelocityAfterDeletionPreviousTopThree() {
         initGarage();
 
         garage.removeCar(car4.getCarId());
@@ -214,7 +214,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test018_carsWithPowerMoreThan_positive() {
+    public void carsWithPowerMoreThanPositive() {
         initGarage();
 
         Set<Car> cars = garage.carsWithPowerMoreThan(3);
@@ -228,7 +228,7 @@ public class GarageImplTest {
     }
 
     @Test
-    public void test019_carsWithPowerMoreThan_AfterDeletion() {
+    public void carsWithPowerMoreThanAfterDeletion() {
         initGarage();
 
         garage.removeCar(car7.getCarId());
